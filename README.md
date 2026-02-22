@@ -6,20 +6,31 @@
 
 Sundt is developing an enterprise data maturity model that uses data observability and catalog capabilities to strengthen data culture and accelerate AI-ready data products.
 
-## Current Data Pipeline Inventory (As-Is)
+## Current Data Source Landscape
 
-Current-state view of known pipeline sources and processing flow from `docs/Sundt Documentation.docx`. Update owner and classification fields as you validate with domain teams.
+Note: `docs/Sundt Documentation.docx` is historical baseline documentation and is no longer a complete inventory of current sources.
 
-| Source System | Owner | Type | Ingestion Path | Processing Path | Serving/Consumption Path | Contains PII? | Criticality (H/M/L) | Current State | Notes |
-|---|---|---|---|---|---|---|---|---|---|
-| RedShift | TBD | Data Warehouse | ADF metadata-driven source-to-bronze (`adf.dataSource`) | Databricks bronze/silver/gold via ADF metadata (`adf.dataProcess`, `adf.dataProcessDependency`) | Databricks SQL Warehouse + Power BI datasets | TBD | H | Active | Referenced by ADF dataset naming (`dsRedShift`) |
-| Salesforce | TBD | CRM/API | ADF metadata-driven source-to-bronze (`adf.dataSource`) | Databricks bronze/silver/gold via ADF metadata | Databricks SQL Warehouse + Power BI datasets | TBD | H | Active | Trigger pattern example exists (`*_trSalesforceWeekly`) |
-| InEight | TBD | SaaS/API | ADF ingestion + metadata-driven orchestration | Databricks transformations and RLS-related table updates | Power BI RLS dataset refresh + web app support tables | TBD | H | Active | Referenced as source for contact/RLS updates |
-| Cosential | TBD | CRM/API | ADF ingestion + metadata-driven orchestration | Databricks transformations and RLS-related table updates | Power BI RLS dataset refresh + web app support tables | TBD | H | Active | Referenced as source for contact/RLS updates |
-| On-Prem SQL Sources | TBD | SQL | ADF via self-hosted IR to ADLS raw/bronze | Databricks bronze/silver/gold via ADF metadata | Databricks SQL Warehouse + Power BI datasets | TBD | H | Active | Uses shared Dev/Test self-hosted IR and separate Prod IR |
-| File Drops (CSV/JSON/XLSX) | TBD | File | ADF copy to ADLS raw (retained as source format) | Databricks conversion/processing to Delta layers | Databricks SQL Warehouse + Power BI datasets | TBD | M | Active | JSON/CSV/XLSX described as current ingestion patterns |
-| Bigeye | Data Engineering / Data Governance (TBD) | Data Observability Platform | Connectors to warehouse/lakehouse datasets and pipeline outputs | Automated quality/freshness/volume checks and anomaly monitoring | Operational monitoring, alerting, and data reliability reporting | Unknown | H | Active | Used for data monitoring and observability |
-| Alation | Data Governance (TBD) | Data Catalog / Metadata Platform | Metadata ingestion from warehouse/lakehouse and BI assets | Cataloging, metadata enrichment, stewardship, and lineage context | Data discovery, governance, and trusted data product enablement | Unknown | H | Active | Enterprise data catalog for metadata management |
+Current source types in scope include:
+- Azure SQL databases and Azure SQL servers
+- SQL Server (cloud and on-premises)
+- APIs and SaaS application integrations
+- Flat files (CSV, JSON, XLSX, parquet)
+- Integration/orchestration tooling feeds
+- Observability and catalog metadata feeds (Bigeye, Alation)
+
+## Current Inventory (Maintain Here)
+
+Use this table as the live source inventory for planning, onboarding, and maturity scoring.
+
+| Source System | Owner | Source Type | Platform/Host | Ingestion Pattern | Processing Pattern | Serving/Consumption | Contains PII? | Criticality | Current State | Notes |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Azure SQL - Source Group A | TBD | Azure SQL | Azure | ADF metadata-driven ingest | Databricks bronze/silver/gold | SQL Warehouse + BI | TBD | H | Active | Replace with actual server/database names |
+| SQL Server - Source Group B | TBD | SQL Server | Azure/On-Prem | ADF via managed or self-hosted IR | Databricks bronze/silver/gold | SQL Warehouse + BI | TBD | H | Active | Capture auth method and connectivity path |
+| API Integrations - Group C | TBD | API/SaaS | Vendor Cloud | ADF/Notebook API ingestion | Databricks normalization and harmonization | SQL Warehouse + BI/App | TBD | H | Active | Include rate limits and token strategy |
+| Flat Files - Group D | TBD | File | ADLS/SFTP/Share | Scheduled and event-driven file loads | Databricks schema and quality processing | SQL Warehouse + BI | TBD | M | Active | Track file contract/versioning |
+| Integration Tool Feeds - Group E | TBD | Integration Tool | Mixed | Tool-specific connectors and pipeline orchestration | Standardized mapping to curated layers | App/BI/Operational Consumers | TBD | H | Active | List tool names and owners |
+| Bigeye | Data Engineering / Governance | Observability Metadata | Bigeye | Monitor/alert metadata ingest | Scorecard and incident analytics | Ops dashboards and governance | N | H | Active | Data reliability and early detection coverage |
+| Alation | Data Governance | Catalog Metadata | Alation | Catalog/lineage metadata ingest | Stewardship and maturity attributes | Governance and discovery workflows | N | H | Active | Endorsement and metadata completeness |
 
 ## Recommended Artifacts
 
