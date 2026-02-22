@@ -31,6 +31,7 @@ Current-state view of known pipeline sources and processing flow from `docs/Sund
 - `docs/Secret-Inventory-Template.md`: template to inventory and govern all application and platform secrets.
 - `docs/Entra-Managed-Identity-Role-Matrix.md`: role and permission model for users, service principals, and managed identities.
 - `docs/GitHub-Actions-OIDC-Azure-Checklist.md`: checklist for secure GitHub Actions authentication to Azure via OIDC.
+- `docs/GitHub-Azure-Environment-Handoff-Guide.md`: role-based setup and validation guide for GitHub admin and Azure admin handoff.
 - `justfile`: Windows-friendly task runner for tool checks and diagram generation.
 - `.tool-versions` and `.asdfrc`: `asdf` version pinning and behavior config for local/CI consistency.
 - `diagrams/enterprise_maturity_architecture.py`: Python diagrams source for architecture visualization.
