@@ -41,3 +41,19 @@ Current-state view of known pipeline sources and processing flow from `docs/Sund
 - `just asdf-doctor`: verify asdf toolchain plus non-asdf Azure CLI and .NET checks.
 - `just platform-doctor`: verify Windows-hosted Azure CLI and .NET.
 - `just workstation-doctor`: run full baseline checks in one command.
+
+## CI/CD Workflows
+
+- `.github/workflows/01-ci.yml`: CI checks for `dev/main/release/*/hotfix/*` PRs and feature/hotfix pushes.
+- `.github/workflows/02-build-and-deploy-dev.yml`: build and deploy to `dev` on push to `dev` (or manual run).
+- `.github/workflows/03-promote-test-and-prod.yml`: auto promote `release/*` to `test`, manual promotion to `test`/`prod` with branch guard for prod.
+
+Required GitHub Environment `secrets` (dev/test/prod):
+- `AZURE_CLIENT_ID`
+- `AZURE_TENANT_ID`
+- `AZURE_SUBSCRIPTION_ID`
+
+Required GitHub Environment `vars` (dev/test/prod):
+- `ACR_NAME`
+- `AZURE_RESOURCE_GROUP`
+- `CONTAINER_APP_NAME`

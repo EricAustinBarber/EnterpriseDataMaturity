@@ -1,0 +1,115 @@
+name: Promote Test and Prod
+
+on:
+  push:
+    branches:
+      - "release/**"
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: "Image tag to promote (already built and tested)"
+        required: true
+        type: string
+      target:
+        description: "Promotion target"
+        required: true
+        type: choice
+        options:
+          - test
+          - prod
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  promote-test-from-release:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment: test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Azure login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Ensure containerapp extension
+        run: |
+          az extension add --name containerapp --upgrade --yes
+
+      - name: Deploy release candidate to test
+        env:
+          ACR_NAME: ${{ vars.ACR_NAME }}
+          IMAGE_NAME: enterprise-data-maturity-app
+          RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
+          CONTAINER_APP_NAME: ${{ vars.CONTAINER_APP_NAME }}
+        run: |
+          set -euo pipefail
+          IMAGE_TAG="${GITHUB_SHA::12}"
+          IMAGE_REF="${ACR_NAME}.azurecr.io/${IMAGE_NAME}:${IMAGE_TAG}"
+          az containerapp show --name "${CONTAINER_APP_NAME}" --resource-group "${RESOURCE_GROUP}" 1>/dev/null
+          az containerapp update \
+            --name "${CONTAINER_APP_NAME}" \
+            --resource-group "${RESOURCE_GROUP}" \
+            --image "${IMAGE_REF}"
+
+      - name: Post-deploy smoke validation
+        run: |
+          echo "Run test smoke checks"
+
+  manual-promote:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.target }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate prod promotion branch
+        if: github.event.inputs.target == 'prod'
+        run: |
+          set -euo pipefail
+          if [[ "${GITHUB_REF}" != "refs/heads/main" && "${GITHUB_REF}" != refs/heads/hotfix/* ]]; then
+            echo "Prod promotions are only allowed from main or hotfix/* branches."
+            exit 1
+          fi
+
+      - name: Azure login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Ensure containerapp extension
+        run: |
+          az extension add --name containerapp --upgrade --yes
+
+      - name: Deploy promoted artifact
+        env:
+          ACR_NAME: ${{ vars.ACR_NAME }}
+          IMAGE_NAME: enterprise-data-maturity-app
+          RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
+          CONTAINER_APP_NAME: ${{ vars.CONTAINER_APP_NAME }}
+        run: |
+          set -euo pipefail
+          IMAGE_REF="${ACR_NAME}.azurecr.io/${IMAGE_NAME}:${{ github.event.inputs.image_tag }}"
+          az containerapp show --name "${CONTAINER_APP_NAME}" --resource-group "${RESOURCE_GROUP}" 1>/dev/null
+          az containerapp update \
+            --name "${CONTAINER_APP_NAME}" \
+            --resource-group "${RESOURCE_GROUP}" \
+            --image "${IMAGE_REF}"
+
+      - name: Post-deploy smoke validation
+        run: |
+          set -euo pipefail
+          az containerapp show \
+            --name "${{ vars.CONTAINER_APP_NAME }}" \
+            --resource-group "${{ vars.AZURE_RESOURCE_GROUP }}" \
+            --query "properties.latestReadyRevisionName" \
+            --output tsv
