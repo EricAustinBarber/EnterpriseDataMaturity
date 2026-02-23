@@ -1,0 +1,122 @@
+version: 1
+description: "Connection and ingestion registry for maturity scorecard data collection."
+
+environments:
+  dev:
+    azure_subscription_id: "<sub-dev-id>"
+    resource_group: "rg-edm-dev-app"
+    key_vault_uri: "https://kv-edm-dev-core.vault.azure.net/"
+  test:
+    azure_subscription_id: "<sub-test-id>"
+    resource_group: "rg-edm-test-app"
+    key_vault_uri: "https://kv-edm-test-core.vault.azure.net/"
+  prod:
+    azure_subscription_id: "<sub-prod-id>"
+    resource_group: "rg-edm-prod-app"
+    key_vault_uri: "https://kv-edm-prod-core.vault.azure.net/"
+
+sources:
+  - source_id: adf_metadata_sql
+    domain: pipeline_health
+    system: "Azure Data Factory Metadata DB"
+    source_type: "azure_sql"
+    owner_team: "Data Engineering"
+    active: true
+    connection:
+      auth_mode: "entra_or_key_vault_secret"
+      endpoint: "<sql-server-name>.database.windows.net"
+      port: 1433
+      database: "<metadata-db-name>"
+      secret_refs:
+        sql_connection_string: "sec-edm-adf-sql-connection-string-<env>"
+      objects:
+        - "adf.executionLog"
+        - "<monitoring_view_1>"
+        - "<monitoring_view_2>"
+      probe:
+        enabled: true
+        mode: "tcp"
+    ingestion:
+      mode: "incremental"
+      watermark_column: "end_ts"
+      frequency: "daily"
+      target_table: "raw_pipeline_runs"
+
+  - source_id: databricks_ops
+    domain: engineering_standards
+    system: "Azure Databricks"
+    source_type: "databricks_sql_api"
+    owner_team: "Data Platform Engineering"
+    active: true
+    connection:
+      auth_mode: "entra_or_pat_via_key_vault"
+      workspace_url: "https://<workspace>.azuredatabricks.net"
+      sql_warehouse_id: "<warehouse-id>"
+      secret_refs:
+        databricks_pat: "sec-edm-dbx-pat-<env>"
+      objects:
+        - "<table_inventory_query>"
+        - "<job_runs_query>"
+        - "<delta_detail_query>"
+      probe:
+        enabled: true
+        mode: "api"
+        path: "/api/2.0/clusters/list"
+    ingestion:
+      mode: "incremental"
+      watermark_column: "event_ts"
+      frequency: "daily"
+      target_table: "raw_databricks_standards"
+
+  - source_id: bigeye_monitoring
+    domain: observability
+    system: "Bigeye"
+    source_type: "api"
+    owner_team: "Data Governance / Data Engineering"
+    active: true
+    connection:
+      auth_mode: "api_token_from_key_vault"
+      base_url: "https://<bigeye-api-host>"
+      secret_refs:
+        api_token: "sec-edm-bigeye-api-token-<env>"
+      objects:
+        - "monitors"
+        - "alerts"
+        - "datasets"
+      probe:
+        enabled: true
+        mode: "api"
+        path: "/"
+    ingestion:
+      mode: "incremental"
+      watermark_column: "updated_at"
+      frequency: "hourly"
+      target_tables:
+        - "raw_bigeye_monitors"
+        - "raw_bigeye_alerts"
+
+  - source_id: alation_catalog
+    domain: governance
+    system: "Alation"
+    source_type: "api"
+    owner_team: "Data Governance"
+    active: true
+    connection:
+      auth_mode: "api_token_from_key_vault"
+      base_url: "https://<alation-host>"
+      secret_refs:
+        api_token: "sec-edm-alation-api-token-<env>"
+      objects:
+        - "assets"
+        - "stewardship"
+        - "endorsement"
+        - "lineage"
+      probe:
+        enabled: true
+        mode: "api"
+        path: "/"
+    ingestion:
+      mode: "incremental"
+      watermark_column: "updated_at"
+      frequency: "daily"
+      target_table: "raw_alation_assets"

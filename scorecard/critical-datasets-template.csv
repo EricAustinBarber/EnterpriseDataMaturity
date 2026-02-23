@@ -1,0 +1,4 @@
+dataset_id,dataset_name,domain_name,business_owner,technical_owner,source_system,source_type,contains_pii,criticality,sla_freshness,serving_layer,is_active,notes
+DS001,example_sales_orders,sales,Owner TBD,Tech Owner TBD,Azure SQL - Source Group A,azure_sql,unknown,H,Daily,sql_warehouse,true,Replace with real dataset
+DS002,example_project_costs,operations,Owner TBD,Tech Owner TBD,SQL Server - Source Group B,sql_server,unknown,H,Daily,sql_warehouse,true,Replace with real dataset
+DS003,example_customer_master,customer,Owner TBD,Tech Owner TBD,API Integrations - Group C,api,unknown,H,Hourly,bi_semantic,true,Replace with real dataset

@@ -1,0 +1,20 @@
+metric_id,metric_name,section,weight,level,formula,source_table,threshold_green,threshold_yellow,threshold_red,owner_team,notes
+A1,pipeline_success_rate,pipeline_health,10,dataset,successful_runs/total_runs*100,stg_pipeline_execution,98,95,<95,Data Engineering,Use rolling 30-day window
+A2,runtime_variance,pipeline_health,8,dataset,abs(current_avg_runtime-baseline_runtime)/baseline_runtime,stg_pipeline_execution,<=0.15,<=0.25,>0.25,Data Engineering,Baseline per dataset/pipeline
+A3,failure_recovery_time,pipeline_health,6,dataset,median(recovery_duration_seconds),stg_pipeline_execution,<=2h,<=8h,>8h,Data Engineering,Use business calendar if required
+A4,return_state_completeness,pipeline_health,6,dataset,classified_runs/total_runs*100,stg_pipeline_execution,100,>=95,<95,Data Engineering,Require error_class for failures
+B1,notebook_parameterization,databricks_standards,5,dataset,parameterized_notebooks/total_notebooks*100,stg_databricks_practices,>=90,>=75,<75,Data Platform Engineering,Use notebook metadata checks
+B2,delta_compliance,databricks_standards,5,dataset,delta_tables/total_tables*100,stg_databricks_practices,100,>=95,<95,Data Platform Engineering,Curated layers should be fully delta
+B3,merge_standardization,databricks_standards,5,dataset,merge_compliant_jobs/total_incremental_jobs*100,stg_databricks_practices,>=90,>=75,<75,Data Platform Engineering,Applies to incremental patterns
+B4,data_sanitization_controls,databricks_standards,5,dataset,sanitized_datasets/assessed_datasets*100,stg_databricks_practices,>=95,>=80,<80,Data Platform Engineering,Null/type/domain validations
+B5,table_hygiene_compliance,databricks_standards,4,dataset,hygiene_compliant_tables/assessed_tables*100,stg_databricks_practices,>=90,>=75,<75,Data Platform Engineering,Optimize/vacuum policy checks
+B6,partition_cluster_quality,databricks_standards,4,dataset,partition_cluster_valid_tables/assessed_large_tables*100,stg_databricks_practices,>=90,>=75,<75,Data Platform Engineering,Large table criteria required
+B7,file_size_efficiency,databricks_standards,2,dataset,healthy_file_size_tables/assessed_large_tables*100,stg_databricks_practices,>=90,>=75,<75,Data Platform Engineering,Define size and small-file thresholds
+C1,bigeye_monitor_coverage,observability,8,dataset,monitored_critical_datasets/critical_datasets*100,stg_observability_coverage,>=95,>=80,<80,Data Governance,Critical datasets from inventory
+C2,early_detection_coverage,observability,6,dataset,early_detection_enabled/critical_datasets*100,stg_observability_coverage,>=90,>=75,<75,Data Governance,Freshness/volume/schema/anomaly
+C3,alert_actionability,observability,4,dataset,actionable_alerts/total_alerts*100,stg_observability_coverage,>=95,>=85,<85,Data Governance,Owner+severity+runbook required
+C4,proactive_response_rate,observability,2,dataset,proactive_incidents/total_incidents*100,stg_observability_coverage,>=70,>=50,<50,Data Governance,Define proactive criteria
+D1,alation_endorsed_coverage,governance,6,dataset,endorsed_critical_datasets/critical_datasets*100,stg_catalog_governance,>=90,>=75,<75,Data Governance,Use endorsed/certified flag
+D2,metadata_completeness,governance,8,dataset,complete_assets/critical_assets*100,stg_catalog_governance,>=95,>=85,<85,Data Governance,Owner steward definition sensitivity lineage usage
+D3,stewardship_freshness,governance,3,dataset,attested_assets/critical_assets*100,stg_catalog_governance,>=90,>=75,<75,Data Governance,Review attest cycle policy needed
+D4,maturity_writeback_completeness,governance,3,dataset,maturity_written_assets/critical_assets*100,stg_catalog_governance,100,>=95,<95,Data Governance,Alation writeback coverage

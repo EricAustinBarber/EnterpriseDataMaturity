@@ -69,3 +69,11 @@ setup-diagrams:
 diagram:
   @.\\.venv\\Scripts\\python diagrams\\enterprise_maturity_architecture.py
   @Write-Output "Architecture diagram generated in diagrams\\out\\"
+
+setup-scorecard:
+  @if (!(Test-Path .venv)) { python -m venv .venv }
+  @.\\.venv\\Scripts\\python -m pip install --upgrade pip
+  @.\\.venv\\Scripts\\pip install -r requirements\\scorecard.txt
+
+scorecard-probe ENV="dev":
+  @.\\.venv\\Scripts\\python scorecard\\scripts\\connection_probe.py --env {{ENV}}

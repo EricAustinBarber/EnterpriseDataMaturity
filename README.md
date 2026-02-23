@@ -32,6 +32,23 @@ Use this table as the live source inventory for planning, onboarding, and maturi
 | Bigeye | Data Engineering / Governance | Observability Metadata | Bigeye | Monitor/alert metadata ingest | Scorecard and incident analytics | Ops dashboards and governance | N | H | Active | Data reliability and early detection coverage |
 | Alation | Data Governance | Catalog Metadata | Alation | Catalog/lineage metadata ingest | Stewardship and maturity attributes | Governance and discovery workflows | N | H | Active | Endorsement and metadata completeness |
 
+## Scorecard Implementation Start
+
+- `scorecard/README.md`: implementation entry point for scorecard collection.
+- `scorecard/source-connectors.yaml`: source registry for ADF, Databricks, Bigeye, and Alation collection.
+- `scorecard/critical-datasets-template.csv`: dataset ownership and criticality inventory template.
+- `scorecard/metric-catalog.csv`: weighted metric definitions, formulas, and thresholds.
+- `scorecard/collection-runbook.md`: recurring execution steps for ingest, normalize, score, and publish.
+- `docs/Connection-First-Execution-Guide.md`: secure connectivity-first validation workflow before scoring.
+- `scorecard/scripts/connection_probe.py`: live source connectivity probes using Entra + Key Vault (no plaintext secrets).
+
+## Assessment Workspace (Pre-Scoring)
+
+- `assessments/README.md`: execution order for Databricks and ADF metadata assessment work.
+- `assessments/databricks-transformation-review.md`: completeness checklist for notebook transformations.
+- `assessments/adf-metadata-review.md`: quality/maturity checklist for ADF metadata tables.
+- `assessments/assessment-tracker.csv`: shared remediation tracker across assessments.
+
 ## Recommended Artifacts
 
 - `docs/Roadmap-Data-Maturity-AI-Readiness.md`: modernization roadmap and AI-readiness assessment framework.
@@ -53,6 +70,8 @@ Use this table as the live source inventory for planning, onboarding, and maturi
 - `just asdf-doctor`: verify asdf toolchain plus non-asdf Azure CLI and .NET checks.
 - `just platform-doctor`: verify Windows-hosted Azure CLI and .NET.
 - `just workstation-doctor`: run full baseline checks in one command.
+- `just setup-scorecard`: install scorecard probe dependencies.
+- `just scorecard-probe ENV=dev`: run secure live connectivity probe for an environment.
 
 ## CI/CD Workflows
 

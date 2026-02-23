@@ -3,3 +3,5 @@ __pycache__/
 .venv/
 diagrams/out/
 .azure/
+assessments/external/
+assessments/evidence/
